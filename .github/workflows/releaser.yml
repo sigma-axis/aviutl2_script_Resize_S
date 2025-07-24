@@ -5,7 +5,7 @@ on:
     - '*'
 
 env:
-  REPOSITORY_NAME: RadRotDirBlur_S
+  REPOSITORY_NAME: Resize_S
 
   TIME_ZONE: Asia/Tokyo
   # Time zone for the timestamp when releasing.
