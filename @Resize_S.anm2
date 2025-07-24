@@ -1,0 +1,637 @@
+--[[
+MIT License
+Copyright (c) 2025 sigma-axis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+https://mit-license.org/
+]]
+@リサイズσ
+--information:リサイズσ@Resize_S v1.00
+--label:変形
+--track@zoom:拡大率,0,5000,100,0.001
+--track@sz_x:X,0,5000,100,0.001
+--track@sz_y:Y,0,5000,100,0.001
+--check@move_center:中心の位置を変更,0
+--check@absolute:ピクセル数でサイズ指定,0
+--select@upscale:拡大方法=5,最近傍法=0,双線形=1,Mitchell-Netravali=2,Catmull-Rom=3,Lanczos2=4,Lanczos3=5
+--select@downscale:縮小方法=5,最近傍法=0,単純平均=1,双線形=2,Hamming=3,Lanczos2=4,Lanczos3=5
+--value@PI:PI,{}
+--[[pixelshader@swap_xy:
+Texture2D src : register(t0);
+float4 swap_xy(float4 pos : SV_Position) : SV_Target
+{
+	return src.Load(int3(pos.yx, 0));
+}
+]]
+--[[pixelshader@cubic_MN_up:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float inv_zoom;
+};
+
+int get_width()
+{
+	uint w_src_u, _;
+	src.GetDimensions(w_src_u, _);
+	return int(w_src_u);
+}
+const static int max_src = get_width() - 1;
+float4 load(int2 pos)
+{
+	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+}
+
+float ker0(float x)
+{
+	return (8 / 9.0) - (2 - (7 / 6.0) * x) * x * x;
+}
+float ker1(float x)
+{
+	return (8 - 7 * x) * (2 - x) * (2 - x) / 18.0;
+}
+
+float4 cubic_MN_up(float4 pos : SV_Position) : SV_Target
+{
+	float2 pos_src = float2(inv_zoom * pos.y, pos.x) - 0.5;
+	int2 pos_src_i = floor(pos_src);
+	float t = pos_src.x - pos_src_i.x;
+
+	float4 sum = 0.0;
+	sum += ker1(t + 1) * load(pos_src_i - int2(1, 0));
+	sum += ker0(t    ) * load(pos_src_i);
+	sum += ker0(1 - t) * load(pos_src_i + int2(1, 0));
+	sum += ker1(2 - t) * load(pos_src_i + int2(2, 0));
+
+	return saturate(sum);
+}
+]]
+--[[pixelshader@cubic_CR_up:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float inv_zoom;
+};
+
+int get_width()
+{
+	uint w_src_u, _;
+	src.GetDimensions(w_src_u, _);
+	return int(w_src_u);
+}
+const static int max_src = get_width() - 1;
+float4 load(int2 pos)
+{
+	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+}
+
+float ker0(float x)
+{
+	return (1 + x - 1.5 * x * x) * (1 - x);
+}
+float ker1(float x)
+{
+	return 0.5 * (1 - x) * (2 - x) * (2 - x);
+}
+
+float4 cubic_CR_up(float4 pos : SV_Position) : SV_Target
+{
+	float2 pos_src = float2(inv_zoom * pos.y, pos.x) - 0.5;
+	int2 pos_src_i = floor(pos_src);
+	float t = pos_src.x - pos_src_i.x;
+
+	float4 sum = 0.0;
+	sum += ker1(t + 1) * load(pos_src_i - int2(1, 0));
+	sum += ker0(t    ) * load(pos_src_i);
+	sum += ker0(1 - t) * load(pos_src_i + int2(1, 0));
+	sum += ker1(2 - t) * load(pos_src_i + int2(2, 0));
+
+	return saturate(sum);
+}
+]]
+--[[pixelshader@lanczos2_up:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float inv_zoom;
+};
+
+int get_width()
+{
+	uint w_src_u, _;
+	src.GetDimensions(w_src_u, _);
+	return int(w_src_u);
+}
+const static int max_src = get_width() - 1;
+float4 load(int2 pos)
+{
+	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+}
+
+float ker(float x)
+{
+	const float pi = 3.14159265358979323846;
+	if (abs(x) < 1 / 256.0)
+		return 1 - (pi * pi * (1 + 1 / 4.0) / 6) * (x * x); // differs only by O(x^4).
+	return sin((pi / 2) * x) * sin(pi * x) / ((pi * pi / 2) * x * x);
+}
+
+float4 lanczos2_up(float4 pos : SV_Position) : SV_Target
+{
+	float2 pos_src = float2(inv_zoom * pos.y, pos.x) - 0.5;
+	int2 pos_src_i = floor(pos_src);
+	float t = pos_src.x - pos_src_i.x;
+
+	float4 sum = 0.0; float V = 0.0, v;
+	v = ker(t + 1); sum += v * load(pos_src_i - int2(1, 0)); V += v;
+	v = ker(t    ); sum += v * load(pos_src_i);              V += v;
+	v = ker(t - 1); sum += v * load(pos_src_i + int2(1, 0)); V += v;
+	v = ker(t - 2); sum += v * load(pos_src_i + int2(2, 0)); V += v;
+
+	return saturate(sum / V);
+}
+]]
+--[[pixelshader@lanczos3_up:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float inv_zoom;
+};
+
+int get_width()
+{
+	uint w_src_u, _;
+	src.GetDimensions(w_src_u, _);
+	return int(w_src_u);
+}
+const static int max_src = get_width() - 1;
+float4 load(int2 pos)
+{
+	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+}
+
+float ker(float x)
+{
+	const float pi = 3.14159265358979323846;
+	if (abs(x) < 1 / 256.0)
+		return 1 - (pi * pi * (1 + 1 / 9.0) / 6) * (x * x); // differs only by O(x^4).
+	return sin((pi / 3) * x) * sin(pi * x) / ((pi * pi / 3) * x * x);
+}
+
+float4 lanczos3_up(float4 pos : SV_Position) : SV_Target
+{
+	float2 pos_src = float2(inv_zoom * pos.y, pos.x) - 0.5;
+	int2 pos_src_i = floor(pos_src);
+	float t = pos_src.x - pos_src_i.x;
+
+	float4 sum = 0.0; float V = 0.0, v;
+	v = ker(t + 2); sum += v * load(pos_src_i - int2(2, 0)); V += v;
+	v = ker(t + 1); sum += v * load(pos_src_i - int2(1, 0)); V += v;
+	v = ker(t    ); sum += v * load(pos_src_i);              V += v;
+	v = ker(t - 1); sum += v * load(pos_src_i + int2(1, 0)); V += v;
+	v = ker(t - 2); sum += v * load(pos_src_i + int2(2, 0)); V += v;
+	v = ker(t - 3); sum += v * load(pos_src_i + int2(3, 0)); V += v;
+
+	return saturate(sum / V);
+}
+]]
+--[[pixelshader@bilinear_dn:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float inv_zoom;
+};
+
+int get_width()
+{
+	uint w_src_u, _;
+	src.GetDimensions(w_src_u, _);
+	return int(w_src_u);
+}
+const static int max_src = get_width() - 1;
+float4 load(int2 pos)
+{
+	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+}
+
+float ker(float x)
+{
+	return 1 - abs(x);
+}
+
+float4 bilinear_dn(float4 pos : SV_Position) : SV_Target
+{
+	float zoom = 1 / inv_zoom;
+	int3 pos_src_i = floor(float3(inv_zoom * (pos.y - 1) + 1, inv_zoom * (pos.y + 1), pos.x) - 0.5);
+	float t = zoom * (pos_src_i.x + 0.5) - pos.y;
+
+	float4 sum = 0.0; float V = 0.0;
+	for (int x = pos_src_i.x; x <= pos_src_i.y; x++) {
+		float v = ker(t);
+		sum += v * load(int2(x, pos_src_i.z));
+		V += v; t += zoom;
+	}
+
+	return sum / V;
+}
+]]
+--[[pixelshader@hamming_dn:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float inv_zoom;
+};
+
+int get_width()
+{
+	uint w_src_u, _;
+	src.GetDimensions(w_src_u, _);
+	return int(w_src_u);
+}
+const static int max_src = get_width() - 1;
+float4 load(int2 pos)
+{
+	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+}
+
+float ker(float x)
+{
+	const float pi = 3.14159265358979323846,
+		a0 = 0.53836, a1 = 0.46164;
+	return a0 - a1 * cos(pi / 2 * x);
+}
+
+float4 hamming_dn(float4 pos : SV_Position) : SV_Target
+{
+	float zoom = 1 / inv_zoom;
+	int3 pos_src_i = floor(float3(inv_zoom * (pos.y - 1) + 1, inv_zoom * (pos.y + 1), pos.x) - 0.5);
+	float t = zoom * (pos_src_i.x + 0.5) - pos.y;
+
+	float4 sum = 0.0; float V = 0.0;
+	for (int x = pos_src_i.x; x <= pos_src_i.y; x++) {
+		float v = ker(t);
+		sum += v * load(int2(x, pos_src_i.z));
+		V += v; t += zoom;
+	}
+
+	return sum / V;
+}
+]]
+--[[pixelshader@lanczos2_dn:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float inv_zoom;
+};
+
+int get_width()
+{
+	uint w_src_u, _;
+	src.GetDimensions(w_src_u, _);
+	return int(w_src_u);
+}
+const static int max_src = get_width() - 1;
+float4 load(int2 pos)
+{
+	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+}
+
+float ker(float x)
+{
+	const float pi = 3.14159265358979323846;
+	if (abs(x) < 1 / 256.0)
+		return 1 - (pi * pi * (1 + 1 / 4.0) / 6) * (x * x); // differs only by O(x^4).
+	return sin((pi / 2) * x) * sin(pi * x) / ((pi * pi / 2) * x * x);
+}
+
+float4 lanczos2_dn(float4 pos : SV_Position) : SV_Target
+{
+	float zoom = 1 / inv_zoom;
+	int3 pos_src_i = floor(float3(inv_zoom * (pos.y - 2) + 1, inv_zoom * (pos.y + 2), pos.x) - 0.5);
+	float t = zoom * (pos_src_i.x + 0.5) - pos.y;
+
+	float4 sum = 0.0; float V = 0.0;
+	for (int x = pos_src_i.x; x <= pos_src_i.y; x++) {
+		float v = ker(t);
+		sum += v * load(int2(x, pos_src_i.z));
+		V += v; t += zoom;
+	}
+
+	return sum / V;
+}
+]]
+--[[pixelshader@lanczos3_dn:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float inv_zoom;
+};
+
+int get_width()
+{
+	uint w_src_u, _;
+	src.GetDimensions(w_src_u, _);
+	return int(w_src_u);
+}
+const static int max_src = get_width() - 1;
+float4 load(int2 pos)
+{
+	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+}
+
+float ker(float x)
+{
+	const float pi = 3.14159265358979323846;
+	if (abs(x) < 1 / 256.0)
+		return 1 - (pi * pi * (1 + 1 / 9.0) / 6) * (x * x); // differs only by O(x^4).
+	return sin((pi / 3) * x) * sin(pi * x) / ((pi * pi / 3) * x * x);
+}
+
+float4 lanczos3_dn(float4 pos : SV_Position) : SV_Target
+{
+	float zoom = 1 / inv_zoom;
+	int3 pos_src_i = floor(float3(inv_zoom * (pos.y - 3) + 1, inv_zoom * (pos.y + 3), pos.x) - 0.5);
+	float t = zoom * (pos_src_i.x + 0.5) - pos.y;
+
+	float4 sum = 0.0; float V = 0.0;
+	for (int x = pos_src_i.x; x <= pos_src_i.y; x++) {
+		float v = ker(t);
+		sum += v * load(int2(x, pos_src_i.z));
+		V += v; t += zoom;
+	}
+
+	return sum / V;
+}
+]]
+
+local obj, tonumber, type, math = obj, tonumber, type, math;
+
+-- take parameters.
+--[==[
+	PI = {
+		zoom: number?,
+		sz: table? { x, y },
+		move_center: boolean|number?,
+		absolute: boolean|number?,
+		upscale: 0|1|2|3|4|5|nil,
+		downscale: 0|1|2|3|4|5|nil,
+	}
+--]==]
+zoom = tonumber(PI.zoom) or zoom;
+if type(PI.sz) == "table" then
+	sz_x = tonumber(PI.sz[1]) or sz_x;
+	sz_y = tonumber(PI.sz[2]) or sz_y;
+end
+if type(PI.move_center) == "boolean" then move_center = PI.move_center;
+elseif type(PI.move_center) == "number" then move_center = PI.move_center ~= 0;
+else move_center = move_center ~= 0 end
+if type(PI.absolute) == "boolean" then absolute = PI.absolute;
+elseif type(PI.absolute) == "number" then absolute = PI.absolute ~= 0;
+else absolute = absolute ~= 0 end
+upscale = tonumber(PI.upscale) or upscale;
+downscale = tonumber(PI.downscale) or downscale;
+
+-- normalize paramters.
+zoom = math.max(zoom / 100, 0);
+sz_x, sz_y = math.max(sz_x, 0), math.max(sz_y, 0);
+if absolute then
+	sz_x, sz_y = math.floor(sz_x), math.floor(sz_y);
+else sz_x, sz_y = sz_x / 100, sz_y / 100 end
+upscale = math.min(math.max(math.floor(0.5 + upscale), 0), 5);
+downscale = math.min(math.max(math.floor(0.5 + downscale), 0), 5);
+
+-- calculate the size.
+local w, h = obj.w, obj.h;
+local W, H = w, h;
+if absolute then W, H = sz_x, sz_y;
+else W, H = sz_x * W, sz_y * H end
+local max_W, max_H = obj.getinfo("image_max");
+W, H = math.min(math.floor(0.5 + zoom * W), max_W), math.min(math.floor(0.5 + zoom * H), max_H);
+
+-- apply resizing.
+local alg_x, alg_y =
+	(W > w and upscale) or (W < w and downscale) or 0,
+	(H > h and upscale) or (H < h and downscale) or 0;
+if W == w and H == h then return end -- no resize.
+
+local function resize_builtin(W, H, interpolate)
+	obj.effect("リサイズ", "ピクセル数でサイズ指定", 1,
+		"補間なし", interpolate and 0 or 1, "X", W, "Y", H);
+end
+if W == 0 or H == 0 or (alg_x <= 1 and alg_y <= 1) then
+	-- 標準の補間ありリサイズはバイリニアで拡大 / 単純平均 (最大 16 ドットサンプル?) で縮小．
+	if alg_x == alg_y then resize_builtin(W, H, alg_x == 1);
+	else
+		resize_builtin(W, h, alg_x == 1);
+		resize_builtin(W, H, alg_y == 1);
+	end
+else
+	local function resize_canvas(W, H)
+		while W < obj.w or H < obj.h do
+			obj.effect("クリッピング", "中心の位置を変更", 1,
+				"右", math.max(obj.w - W, 0), "下", math.max(obj.h - H, 0));
+		end
+		while W > obj.w or H > obj.h do
+			obj.effect("領域拡張", "右", math.max(W - obj.w, 0), "下", math.max(H - obj.h, 0));
+		end
+	end
+	local upscale_names, downscale_names = {
+		[2] = "cubic_MN_up",
+		[3] = "cubic_CR_up",
+		[4] = "lanczos2_up",
+		[5] = "lanczos3_up",
+	}, {
+		[2] = "bilinear_dn",
+		[3] = "hamming_dn",
+		[4] = "lanczos2_dn",
+		[5] = "lanczos3_dn",
+	};
+
+	-- first along x-axis.
+	obj.setoption("drawtarget", "tempbuffer", h == 1 and 2 or 1, 1); -- バグ対処，幅の変化を強制．
+	obj.setoption("drawtarget", "tempbuffer", h, W);
+	if alg_x <= 1 then
+		if W ~= w then resize_builtin(W, h, alg_x == 1) end
+		obj.pixelshader("swap_xy", "tempbuffer", "object");
+	else
+		obj.pixelshader((W > w and upscale_names or downscale_names)[alg_x], "tempbuffer", "object",
+		{
+			w / W
+		});
+	end
+
+	-- then along y-axis.
+	if alg_y <= 1 then
+		resize_canvas(W, h);
+		obj.pixelshader("swap_xy", "object", "tempbuffer");
+		if H ~= h then resize_builtin(W, H, alg_y == 1) end
+	else
+		resize_canvas(W, H);
+		obj.pixelshader((H > h and upscale_names or downscale_names)[alg_y], "object", "tempbuffer",
+		{
+			h / H
+		});
+	end
+end
+
+-- adjust the center.
+if not move_center then
+	-- 本当は「標準描画」の "中心X" などを obj.getvalue("cx") で取得できたらもっと正確な補正ができるけど不可能．
+	-- local cx, cy = obj.getvalue("cx"), obj.getvalue("cy");
+	-- obj.cx = (obj.cx + cx) * W / w - cx;
+	-- obj.cy = (obj.cy + cy) * H / h - cy;
+	obj.cx, obj.cy = obj.cx * W / w, obj.cy * H / h;
+end
+
+@ボックスリサイズσ
+--information:ボックスリサイズσ@Resize_S v1.00
+--label:変形
+--track@width:X,0,4000,256,1
+--track@height:Y,0,4000,256,1
+--select@mode:モード=0,内接最大=0,外接最小=1
+--select@dir:拡大縮小=0,拡縮両方=0,拡大のみ=1,縮小のみ=2
+--check@move_center:中心の位置を変更,1
+--check@crop_pad:余白/クリッピング,1
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@align_y:垂直揃え,-100,100,0,0.001
+--select@upscale:拡大方法=5,最近傍法=0,双線形=1,Mitchell-Netravali=2,Catmull-Rom=3,Lanczos2=4,Lanczos3=5
+--select@downscale:縮小方法=5,最近傍法=0,単純平均=1,双線形=2,Hamming=3,Lanczos2=4,Lanczos3=5
+--value@PI:PI,{}
+
+local obj, tonumber, type, math = obj, tonumber, type, math;
+
+-- take parameters.
+--[==[
+	PI = {
+		sz: table? { x, y },
+		mode: 0|1|nil,
+		dir: 0|1|2|nil,
+		move_center: boolean|number?,
+		crop_pad: boolean|number?,
+		align: table? { ax, ay },
+		upscale: 0|1|2|3|4|5|nil,
+		downscale: 0|1|2|3|4|5|nil,
+	}
+--]==]
+if type(PI.sz) == "table" then
+	width = tonumber(PI.sz[1]) or width;
+	height = tonumber(PI.sz[2]) or height;
+end
+mode = tonumber(PI.mode) or mode;
+dir = tonumber(PI.dir) or dir;
+if type(PI.move_center) == "boolean" then move_center = PI.move_center;
+elseif type(PI.move_center) == "number" then move_center = PI.move_center ~= 0;
+else move_center = move_center ~= 0 end
+if type(PI.crop_pad) == "boolean" then crop_pad = PI.crop_pad;
+elseif type(PI.crop_pad) == "number" then crop_pad = PI.crop_pad ~= 0;
+else crop_pad = crop_pad ~= 0 end
+if type(PI.align) == "table" then
+	align_x = tonumber(PI.align[1]) or align_x;
+	align_y = tonumber(PI.align[2]) or align_y;
+end
+upscale = tonumber(PI.upscale) or upscale;
+downscale = tonumber(PI.downscale) or downscale;
+
+-- normalize paramters.
+width, height = math.max(width, 0), math.max(height, 0);
+mode = math.min(math.max(math.floor(0.5 + mode), 0), 1);
+dir = math.min(math.max(math.floor(0.5 + dir), 0), 2);
+align_x, align_y = math.min(math.max(align_x / 100, -1), 1), math.min(math.max(align_y / 100, -1), 1);
+upscale = math.min(math.max(math.floor(0.5 + upscale), 0), 5);
+downscale = math.min(math.max(math.floor(0.5 + downscale), 0), 5);
+
+-- calculate the size.
+local w, h = obj.w, obj.h;
+local W, H, zoom;
+if (mode == 0) == (width * h <= height * w) then
+	W, H, zoom = width, math.floor(0.5 + width / w * h), width / w;
+else W, H, zoom = math.floor(0.5 + height / h * w), height, height / h end
+if (dir == 2 and (W >= w and H >= h)) or
+	(dir == 1 and (W <= w and H <= h)) then
+	W, H, zoom = w, h, 1; -- no resize.
+end
+
+-- restrict range to process.
+local cr_l, cr_L, cr_t, cr_T, cr_r, cr_R, cr_b, cr_B = 0, 0, 0, 0, 0, 0, 0, 0;
+if crop_pad and mode == 1 then
+	if W > width then
+		local len = w * (1 - width / W);
+		cr_l, cr_L = math.modf(len * (1 + align_x) / 2);
+		cr_r, cr_R = math.modf(len * (1 - align_x) / 2);
+		w = w - (cr_l + cr_r);
+		W = math.floor(0.5 + zoom * w);
+		if cr_L + cr_R == 0 then cr_L, cr_R = 1, 1 end
+		cr_L = math.floor(0.5 + (W - width) * cr_L / (cr_L + cr_R));
+		cr_R = (W - width) - cr_L;
+	end
+	if H > height then
+		local len = h * (1 - height / H);
+		cr_t, cr_T = math.modf(len * (1 + align_y) / 2);
+		cr_b, cr_B = math.modf(len * (1 - align_y) / 2);
+		h = h - (cr_t + cr_b);
+		H = math.floor(0.5 + zoom * h);
+		if cr_T + cr_B == 0 then cr_T, cr_B = 1, 1 end
+		cr_T = math.floor(0.5 + (H - height) * cr_T / (cr_T + cr_B));
+		cr_B = (H - height) - cr_T;
+	end
+end
+local max_W, max_H = obj.getinfo("image_max");
+if W > max_W then
+	local lr = math.ceil(w * (1 - max_W / W) / 2);
+	w, W = w - 2 * lr, math.floor(0.5 + (1 - 2 * lr / w) * W);
+	cr_l, cr_r = cr_l + lr, cr_r + lr;
+end
+if H > max_H then
+	local tb = math.ceil(h * (1 - max_H / H) / 2);
+	h, H = h - 2 * tb, math.floor(0.5 + (1 - 2 * tb / h) * H);
+	cr_t, cr_b = cr_t + tb, cr_b + tb;
+end
+if cr_l > 0 or cr_r > 0 or cr_t > 0 or cr_b > 0 then
+	obj.effect("クリッピング", "上", cr_t, "下", cr_b, "左", cr_l, "右", cr_r,
+		"中心の位置を変更", move_center and 1 or 0);
+end
+
+-- apply resizing.
+if W ~= w or H ~= h then
+	obj.effect("リサイズσ@Resize_S", "PI", ([[
+		sz = { %d, %d },
+		move_center = %s,
+		absolute = true,
+		upscale = %d,
+		downscale = %d,
+	]]):format(W, H, move_center, upscale, downscale));
+end
+
+-- process cropping and padding.
+if cr_L > 0 or cr_R > 0 or cr_T > 0 or cr_B > 0 then
+	obj.effect("クリッピング", "上", cr_T, "下", cr_B, "左", cr_L, "右", cr_R,
+		"中心の位置を変更", move_center and 1 or 0);
+end
+if crop_pad and mode == 0 then
+	cr_L, cr_T, cr_R, cr_B = 0, 0, 0, 0;
+	if obj.w < width then
+		cr_L = math.floor(0.5 + (width - obj.w) * (1 + align_x) / 2);
+		cr_R = (width - obj.w) - cr_L;
+	end
+	if obj.h < height then
+		cr_T = math.floor(0.5 + (height - obj.h) * (1 + align_y) / 2);
+		cr_B = (height - obj.h) - cr_T;
+	end
+	if cr_L > 0 or cr_R > 0 or cr_T > 0 or cr_B > 0 then
+		obj.effect("領域拡張", "上", cr_T, "下", cr_B, "左", cr_L, "右", cr_R);
+
+		-- adjust the center.
+		if not move_center then
+			obj.cx, obj.cy = obj.cx + (cr_L - cr_R) / 2, obj.cy + (cr_T - cr_B) / 2;
+		end
+	end
+end
