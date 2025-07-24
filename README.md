@@ -20,7 +20,7 @@
 
 加えてオブジェクトを特定サイズの矩形内に収めたり，特定サイズの矩形を覆うように拡大するフィルタ効果もあります．
 
-[ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_Resize_S/releases)
+[ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_Resize_S/releases) [紹介動画．](https://www.nicovideo.jp/watch/sm45220623)
 
 ##  動作要件
 
@@ -280,7 +280,7 @@
 
 ## 改版履歴
 
-- **v1.00 (for beta3)** (2025-07-??)
+- **v1.00 (for beta3)** (2025-07-24)
 
   - 初版．
 
