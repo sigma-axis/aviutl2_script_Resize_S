@@ -46,7 +46,7 @@
 
 指定したアルゴリズムで画像に拡大縮小フィルタを適用します．
 
-![リサイズσの GUI](TODO: )
+![リサイズσの GUI](https://github.com/user-attachments/assets/4839bc77-7524-4e0e-8db8-be0a4c56b67b)
 
 ### `拡大率`
 
@@ -155,11 +155,12 @@
 
 ##  ボックスリサイズσ
 
+![適用例](https://github.com/user-attachments/assets/3405f41a-b611-4965-aaff-184b03f7feef)
+
+
 指定したサイズの矩形に合うように拡大縮小フィルタを適用します．矩形内に収まる最大サイズや，矩形を覆う最小サイズを自動的に計算してそのサイズに拡大縮小します．
 
-![適用例](TODO: )
-
-![ボックスリサイズσの GUI](TODO: )
+![ボックスリサイズσの GUI](https://github.com/user-attachments/assets/ce533e96-78b0-455b-9ac2-9e5fcf32e07a)
 
 ### `X`, `Y`
 
