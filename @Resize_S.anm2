@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @リサイズσ
---information:リサイズσ@Resize_S v1.00
+--information:リサイズσ@Resize_S v1.01 (for beta4)
 --label:変形
 --track@zoom:拡大率,0,5000,100,0.001
 --track@sz_x:X,0,5000,100,0.001
@@ -457,7 +457,6 @@ else
 	};
 
 	-- first along x-axis.
-	obj.setoption("drawtarget", "tempbuffer", h == 1 and 2 or 1, 1); -- バグ対処，幅の変化を強制．
 	obj.setoption("drawtarget", "tempbuffer", h, W);
 	if alg_x <= 1 then
 		if W ~= w then resize_builtin(W, h, alg_x == 1) end
@@ -493,7 +492,7 @@ if not move_center then
 end
 
 @ボックスリサイズσ
---information:ボックスリサイズσ@Resize_S v1.00
+--information:ボックスリサイズσ@Resize_S v1.01 (for beta4)
 --label:変形
 --track@width:X,0,4000,256,1
 --track@height:Y,0,4000,256,1
