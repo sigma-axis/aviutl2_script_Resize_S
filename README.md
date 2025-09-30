@@ -147,12 +147,12 @@
 
 ```lua
 {
-  zoom = zoom, -- number 型で "拡大率" の項目を上書き，または nil.
-  sz = { x, y }, -- table 型で "X", "Y" の項目を上書き，または nil.
+  zoom = zoom,               -- number 型で "拡大率" の項目を上書き，または nil.
+  sz = { x, y },             -- table 型で "X", "Y" の項目を上書き，または nil.
   move_center = move_center, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  absolute = absolute, -- boolean 型で "ピクセル数でサイズ指定" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  upscale = upscale, -- number 型で "拡大方法" の項目を上書き，または nil.
-  downscale = downscale, -- number 型で "縮小方法" の項目を上書き，または nil.
+  absolute = absolute,       -- boolean 型で "ピクセル数でサイズ指定" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
+  upscale = upscale,         -- number 型で "拡大方法" の項目を上書き，または nil.
+  downscale = downscale,     -- number 型で "縮小方法" の項目を上書き，または nil.
 }
 ```
 - テキストボックスには冒頭末尾の波括弧 (`{}`) を省略して記述してください．
@@ -258,14 +258,14 @@
 
 ```lua
 {
-  sz = { x, y }, -- table 型で "X", "Y" の項目を上書き，または nil.
-  mode = mode, -- number 型で "モード" の項目を上書き，または nil.
-  dir = dir, -- number 型で "拡大縮小" の項目を上書き，または nil.
+  sz = { x, y },             -- table 型で "X", "Y" の項目を上書き，または nil.
+  mode = mode,               -- number 型で "モード" の項目を上書き，または nil.
+  dir = dir,                 -- number 型で "拡大縮小" の項目を上書き，または nil.
   move_center = move_center, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  crop_pad = crop_pad, -- boolean 型で "余白/クリッピング" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  align = { ax, ay }, -- table 型で "水平揃え", "垂直揃え" の項目を上書き，または nil.
-  upscale = upscale, -- number 型で "拡大方法" の項目を上書き，または nil.
-  downscale = downscale, -- number 型で "縮小方法" の項目を上書き，または nil.
+  crop_pad = crop_pad,       -- boolean 型で "余白/クリッピング" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
+  align = { ax, ay },        -- table 型で "水平揃え", "垂直揃え" の項目を上書き，または nil.
+  upscale = upscale,         -- number 型で "拡大方法" の項目を上書き，または nil.
+  downscale = downscale,     -- number 型で "縮小方法" の項目を上書き，または nil.
 }
 ```
 - テキストボックスには冒頭末尾の波括弧 (`{}`) を省略して記述してください．
