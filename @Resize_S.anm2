@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @リサイズσ
---information:リサイズσ@Resize_S v1.01 (for beta4)
+--information:リサイズσ@Resize_S v1.10 (for beta13) by σ軸
 --label:変形
 --track@zoom:拡大率,0,5000,100,0.001
 --track@sz_x:X,0,5000,100,0.001
@@ -484,15 +484,13 @@ end
 
 -- adjust the center.
 if not move_center then
-	-- 本当は「標準描画」の "中心X" などを obj.getvalue("cx") で取得できたらもっと正確な補正ができるけど不可能．
-	-- local cx, cy = obj.getvalue("cx"), obj.getvalue("cy");
-	-- obj.cx = (obj.cx + cx) * W / w - cx;
-	-- obj.cy = (obj.cy + cy) * H / h - cy;
-	obj.cx, obj.cy = obj.cx * W / w, obj.cy * H / h;
+	local cx, cy = obj.getvalue("cx"), obj.getvalue("cy");
+	obj.cx = (obj.cx + cx) * W / w - cx;
+	obj.cy = (obj.cy + cy) * H / h - cy;
 end
 
 @ボックスリサイズσ
---information:ボックスリサイズσ@Resize_S v1.01 (for beta4)
+--information:ボックスリサイズσ@Resize_S v1.10 (for beta13) by σ軸
 --label:変形
 --track@width:X,0,4000,256,1
 --track@height:Y,0,4000,256,1
