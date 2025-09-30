@@ -28,7 +28,7 @@
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta4` で動作確認済み．
+  - `beta13` で動作確認済み．
 
 ##  導入方法
 
