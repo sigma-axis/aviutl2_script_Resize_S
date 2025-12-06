@@ -23,15 +23,17 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @リサイズσ
---information:リサイズσ@Resize_S v1.10 (for beta13) by σ軸
+--information:リサイズσ@Resize_S v1.11-beta1 (for beta22a) by σ軸
 --label:変形
 --track@zoom:拡大率,0,5000,100,0.001
 --track@sz_x:X,0,5000,100,0.001
 --track@sz_y:Y,0,5000,100,0.001
---check@move_center:中心の位置を変更,0
 --check@absolute:ピクセル数でサイズ指定,0
+--group:アルゴリズム,true
 --select@upscale:拡大方法=5,最近傍法=0,双線形=1,Mitchell-Netravali=2,Catmull-Rom=3,Lanczos2=4,Lanczos3=5
 --select@downscale:縮小方法=5,最近傍法=0,単純平均=1,双線形=2,Hamming=3,Lanczos2=4,Lanczos3=5
+--group
+--check@move_center:中心の位置を変更,0
 --value@PI:PI,{}
 --[[pixelshader@swap_xy:
 Texture2D src : register(t0);
@@ -490,18 +492,22 @@ if not move_center then
 end
 
 @ボックスリサイズσ
---information:ボックスリサイズσ@Resize_S v1.10 (for beta13) by σ軸
+--information:ボックスリサイズσ@Resize_S v1.11-beta1 (for beta22a) by σ軸
 --label:変形
 --track@width:X,0,4000,256,1
 --track@height:Y,0,4000,256,1
 --select@mode:モード=0,内接最大=0,外接最小=1
 --select@dir:拡大縮小=0,拡縮両方=0,拡大のみ=1,縮小のみ=2
---check@move_center:中心の位置を変更,1
---check@crop_pad:余白/クリッピング,1
---track@align_x:水平揃え,-100,100,0,0.001
---track@align_y:垂直揃え,-100,100,0,0.001
+--group:アルゴリズム,true
 --select@upscale:拡大方法=5,最近傍法=0,双線形=1,Mitchell-Netravali=2,Catmull-Rom=3,Lanczos2=4,Lanczos3=5
 --select@downscale:縮小方法=5,最近傍法=0,単純平均=1,双線形=2,Hamming=3,Lanczos2=4,Lanczos3=5
+--group:整列,false
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@align_y:垂直揃え,-100,100,0,0.001
+--check@move_center:中心の位置を変更,1
+--group
+--check@crop_pad:余白/クリッピング,1
+--group:その他,false
 --value@PI:PI,{}
 
 local obj, tonumber, type, math = obj, tonumber, type, math;
