@@ -23,17 +23,17 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @リサイズσ
---information:リサイズσ@Resize_S v1.11-beta1 (for beta22a) by σ軸
+--information:リサイズσ@Resize_S v1.11-beta2 (for beta22a) by σ軸
 --label:変形
 --track@zoom:拡大率,0,5000,100,0.001
 --track@sz_x:X,0,5000,100,0.001
 --track@sz_y:Y,0,5000,100,0.001
---check@absolute:ピクセル数でサイズ指定,0
+--check@absolute:ピクセル数でサイズ指定,false
 --group:アルゴリズム,true
 --select@upscale:拡大方法=5,最近傍法=0,双線形=1,Mitchell-Netravali=2,Catmull-Rom=3,Lanczos2=4,Lanczos3=5
 --select@downscale:縮小方法=5,最近傍法=0,単純平均=1,双線形=2,Hamming=3,Lanczos2=4,Lanczos3=5
 --group
---check@move_center:中心の位置を変更,0
+--check@move_center:中心の位置を変更,false
 --value@PI:PI,{}
 --[[pixelshader@swap_xy:
 Texture2D src : register(t0);
@@ -375,7 +375,7 @@ float4 lanczos3_dn(float4 pos : SV_Position) : SV_Target
 }
 ]]
 
-local obj, tonumber, type, math = obj, tonumber, type, math;
+local obj, math, tonumber, type = obj, math, tonumber, type;
 
 -- take parameters.
 --[==[
@@ -388,17 +388,18 @@ local obj, tonumber, type, math = obj, tonumber, type, math;
 		downscale: 0|1|2|3|4|5|nil,
 	}
 --]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
 zoom = tonumber(PI.zoom) or zoom;
 if type(PI.sz) == "table" then
 	sz_x = tonumber(PI.sz[1]) or sz_x;
 	sz_y = tonumber(PI.sz[2]) or sz_y;
 end
-if type(PI.move_center) == "boolean" then move_center = PI.move_center;
-elseif type(PI.move_center) == "number" then move_center = PI.move_center ~= 0;
-else move_center = move_center ~= 0 end
-if type(PI.absolute) == "boolean" then absolute = PI.absolute;
-elseif type(PI.absolute) == "number" then absolute = PI.absolute ~= 0;
-else absolute = absolute ~= 0 end
+move_center = as_bool(PI.move_center, move_center);
+absolute = as_bool(PI.absolute, absolute);
 upscale = tonumber(PI.upscale) or upscale;
 downscale = tonumber(PI.downscale) or downscale;
 
@@ -492,7 +493,7 @@ if not move_center then
 end
 
 @ボックスリサイズσ
---information:ボックスリサイズσ@Resize_S v1.11-beta1 (for beta22a) by σ軸
+--information:ボックスリサイズσ@Resize_S v1.11-beta2 (for beta22a) by σ軸
 --label:変形
 --track@width:X,0,4000,256,1
 --track@height:Y,0,4000,256,1
@@ -504,13 +505,13 @@ end
 --group:整列,false
 --track@align_x:水平揃え,-100,100,0,0.001
 --track@align_y:垂直揃え,-100,100,0,0.001
---check@move_center:中心の位置を変更,1
+--check@move_center:中心の位置を変更,true
 --group
---check@crop_pad:余白/クリッピング,1
+--check@crop_pad:余白/クリッピング,true
 --group:その他,false
 --value@PI:PI,{}
 
-local obj, tonumber, type, math = obj, tonumber, type, math;
+local obj, math, tonumber, type = obj, math, tonumber, type;
 
 -- take parameters.
 --[==[
@@ -525,18 +526,19 @@ local obj, tonumber, type, math = obj, tonumber, type, math;
 		downscale: 0|1|2|3|4|5|nil,
 	}
 --]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
 if type(PI.sz) == "table" then
 	width = tonumber(PI.sz[1]) or width;
 	height = tonumber(PI.sz[2]) or height;
 end
 mode = tonumber(PI.mode) or mode;
 dir = tonumber(PI.dir) or dir;
-if type(PI.move_center) == "boolean" then move_center = PI.move_center;
-elseif type(PI.move_center) == "number" then move_center = PI.move_center ~= 0;
-else move_center = move_center ~= 0 end
-if type(PI.crop_pad) == "boolean" then crop_pad = PI.crop_pad;
-elseif type(PI.crop_pad) == "number" then crop_pad = PI.crop_pad ~= 0;
-else crop_pad = crop_pad ~= 0 end
+move_center = as_bool(PI.move_center, move_center);
+crop_pad = as_bool(PI.crop_pad, crop_pad);
 if type(PI.align) == "table" then
 	align_x = tonumber(PI.align[1]) or align_x;
 	align_y = tonumber(PI.align[2]) or align_y;
