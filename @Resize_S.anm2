@@ -34,6 +34,7 @@ https://mit-license.org/
 --select@downscale:縮小方法=5,最近傍法=0,単純平均=1,双線形=2,Hamming=3,Lanczos2=4,Lanczos3=5
 --group
 --check@move_center:中心の位置を変更,false
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@swap_xy:
 Texture2D src : register(t0);
