@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @リサイズσ
---information:リサイズσ@Resize_S v1.11-beta2 (for beta22a) by σ軸
+--information:リサイズσ@Resize_S v1.11-beta3 (for beta25) by σ軸
 --label:変形
 --track@zoom:拡大率,0,5000,100,0.001
 --track@sz_x:X,0,5000,100,0.001
@@ -380,12 +380,12 @@ local obj, math, tonumber, type = obj, math, tonumber, type;
 -- take parameters.
 --[==[
 	PI = {
-		zoom: number?,
-		sz: table? { x, y },
-		move_center: boolean|number?,
-		absolute: boolean|number?,
-		upscale: 0|1|2|3|4|5|nil,
-		downscale: 0|1|2|3|4|5|nil,
+		zoom:        number?,
+		sz:          table? { x, y },
+		move_center: boolean|number|nil,
+		absolute:    boolean|number|nil,
+		upscale:     string?,
+		downscale:   string?,
 	}
 --]==]
 local function as_bool(t, v)
@@ -400,8 +400,24 @@ if type(PI.sz) == "table" then
 end
 move_center = as_bool(PI.move_center, move_center);
 absolute = as_bool(PI.absolute, absolute);
-upscale = tonumber(PI.upscale) or upscale;
-downscale = tonumber(PI.downscale) or downscale;
+if PI.upscale then
+	local name2num = {
+		[0] = 0, 1, 2, 3, 4, 5; -- legacy compatibility.
+		["最近傍法"] = 0, ["双線形"] = 1,
+		["Mitchell-Netravali"] = 2, ["Catmull-Rom"] = 3,
+		["Lanczos2"] = 4, ["Lanczos3"] = 5,
+	};
+	upscale = name2num[PI.upscale] or upscale;
+end
+if PI.downscale then
+	local name2num = {
+		[0] = 0, 1, 2, 3, 4, 5; -- legacy compatibility.
+		["最近傍法"] = 0, ["単純平均"] = 1,
+		["双線形"] = 2, ["Hamming"] = 3,
+		["Lanczos2"] = 4, ["Lanczos3"] = 5,
+	};
+	downscale = name2num[PI.downscale] or downscale;
+end
 
 -- normalize paramters.
 zoom = math.max(zoom / 100, 0);
@@ -493,7 +509,7 @@ if not move_center then
 end
 
 @ボックスリサイズσ
---information:ボックスリサイズσ@Resize_S v1.11-beta2 (for beta22a) by σ軸
+--information:ボックスリサイズσ@Resize_S v1.11-beta3 (for beta25) by σ軸
 --label:変形
 --track@width:X,0,4000,256,1
 --track@height:Y,0,4000,256,1
@@ -516,14 +532,14 @@ local obj, math, tonumber, type = obj, math, tonumber, type;
 -- take parameters.
 --[==[
 	PI = {
-		sz: table? { x, y },
-		mode: 0|1|nil,
-		dir: 0|1|2|nil,
+		sz:          table? { x, y },
+		mode:        string?,
+		dir:         string?,
 		move_center: boolean|number?,
-		crop_pad: boolean|number?,
-		align: table? { ax, ay },
-		upscale: 0|1|2|3|4|5|nil,
-		downscale: 0|1|2|3|4|5|nil,
+		crop_pad:    boolean|number?,
+		align:       table? { ax, ay },
+		upscale:     string?,
+		downscale:   string?,
 	}
 --]==]
 local function as_bool(t, v)
@@ -535,24 +551,50 @@ if type(PI.sz) == "table" then
 	width = tonumber(PI.sz[1]) or width;
 	height = tonumber(PI.sz[2]) or height;
 end
-mode = tonumber(PI.mode) or mode;
-dir = tonumber(PI.dir) or dir;
+if PI.mode then
+	local name2num = {
+		[0] = 0, 1; -- legacy compatibility.
+		["内接最大"] = 0, ["外接最小"] = 1,
+	};
+	mode = name2num[PI.mode] or mode;
+end
+if PI.dir then
+	local name2num = {
+		[0] = 0, 1, 2; -- legacy compatibility.
+		["拡縮両方"] = 0, ["拡大のみ"] = 1, ["縮小のみ"] = 2,
+	};
+	dir = name2num[PI.dir] or dir;
+end
 move_center = as_bool(PI.move_center, move_center);
 crop_pad = as_bool(PI.crop_pad, crop_pad);
 if type(PI.align) == "table" then
 	align_x = tonumber(PI.align[1]) or align_x;
 	align_y = tonumber(PI.align[2]) or align_y;
 end
-upscale = tonumber(PI.upscale) or upscale;
-downscale = tonumber(PI.downscale) or downscale;
+if type(PI.upscale) == "string" then upscale = PI.upscale;
+else
+	local num2name = {
+		[0] = "最近傍法", "双線形",
+		"Mitchell-Netravali", "Catmull-Rom",
+		"Lanczos2", "Lanczos3";
+	};
+	upscale = num2name[tonumber(PI.upscale) or upscale] or num2name[5];
+end
+if type(PI.downscale) == "string" then downscale = PI.downscale;
+else
+	-- ", [0] = "最近傍法", "単純平均", "双線形", "Hamming", "Lanczos2", "Lanczos3", "
+	local num2name = {
+		[0] = "最近傍法", "単純平均", "双線形",
+		"Hamming", "Lanczos2", "Lanczos3";
+	};
+	downscale = num2name[tonumber(PI.downscale) or downscale] or num2name[5];
+end
 
 -- normalize paramters.
 width, height = math.max(width, 0), math.max(height, 0);
 mode = math.min(math.max(math.floor(0.5 + mode), 0), 1);
 dir = math.min(math.max(math.floor(0.5 + dir), 0), 2);
 align_x, align_y = math.min(math.max(align_x / 100, -1), 1), math.min(math.max(align_y / 100, -1), 1);
-upscale = math.min(math.max(math.floor(0.5 + upscale), 0), 5);
-downscale = math.min(math.max(math.floor(0.5 + downscale), 0), 5);
 
 -- calculate the size.
 local w, h = obj.w, obj.h;
@@ -611,8 +653,8 @@ if W ~= w or H ~= h then
 		sz = { %d, %d },
 		move_center = %s,
 		absolute = true,
-		upscale = %d,
-		downscale = %d,
+		upscale = %q,
+		downscale = %q,
 	]]):format(W, H, move_center, upscale, downscale));
 end
 
