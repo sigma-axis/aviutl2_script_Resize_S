@@ -22,6 +22,12 @@
 
 [ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_Resize_S/releases) [紹介動画．](https://www.nicovideo.jp/watch/sm45220623)
 
+##  お願い
+
+このスクリプトを使った動画などでは，ニコニコの親作品にこのスクリプトの紹介動画を登録してくれると嬉しいです．任意ではありますが，登録してくれたほうが励みになります．
+
+- 登録 ID: `sm45220623`
+
 ##  動作要件
 
 - AviUtl ExEdit2
