@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/karoterra/aviutl2-aulua/refs/heads/main/schema/aulua.schema.json
+project:
+  variables:
+    NAME: Resize_S
+    AUTHOR: σ軸
+    LEAST_AVIUTL_VERSION: "2005000"
+    LEAST_AVIUTL_VERSION_STRING: beta50
+
+package:
+  id: Resize_S
+  name: 拡大縮小スクリプト Resize_S
+  version: v1.11 (for beta25)
+  information: "{name} {version} by {AUTHOR}"
+  script_sub_dir: ""
+  uninstall_sub_folder_file: false
+  message:
+    text: |
+      # Resize_S AviUtl ExEdit2 拡大縮小スクリプト
+
+      各種拡大縮小フィルタを適用する，標準の「リサイズ」の機能拡張版です．Catmull-Rom や Lanczos 3 などの方法が利用できます．
+      加えてオブジェクトを特定サイズの矩形内に収めたり，特定サイズの矩形を覆うように拡大するフィルタ効果もあります．
+
+      公開ページ:
+      https://github.com/sigma-axis/aviutl2_script_Resize_S
+
+      紹介動画:
+      https://www.nicovideo.jp/watch/sm45220623
+
+      お願い:
+      ニコニコ動画での親作品登録をしていただけると励みになります．
+      作品 ID: sm45220623
+
+  assets:
+    - src: README.md
+      dest: Script/{id}/README.md
+    - src: LICENSE
+      dest: Script/{id}/LICENSE
+  file_name: package.au2pkg.zip
+
+build:
+  out_dir: build
+
+scripts:
+  - name: "@Resize_S.anm2"
+    sources:
+      - path: script/preamble.lua
+      - label: リサイズσ
+        path: script/resize/main.lua
+      - label: ボックスリサイズσ
+        path: script/box/main.lua
