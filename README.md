@@ -34,7 +34,7 @@
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta25` で動作確認済み．
+  - `beta53a` で動作確認済み．
 
 ##  導入方法
 `@Resize_S.anm2` ファイルに対して，以下のいずれかの操作をしてください．
@@ -243,6 +243,14 @@ Although, usage documentations for this script in languages other than Japanese 
 ```
 - テキストボックスには冒頭末尾の波括弧 (`{}`) を省略して記述してください．
 
+## 次の改版予定
+
+- **v1.12 (for beta53a)** (2026-??-??)
+
+  - コード整理．
+  - `beta53a` で動作確認．
+
+
 ## 改版履歴
 
 - **v1.11 (for beta25)** (2025-12-22)
@@ -277,7 +285,7 @@ Although, usage documentations for this script in languages other than Japanese 
 
 The MIT License (MIT)
 
-Copyright (C) 2025 sigma-axis
+Copyright (C) 2025-2026 sigma-axis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
