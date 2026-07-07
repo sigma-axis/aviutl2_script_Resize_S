@@ -63,11 +63,11 @@ local obj, math, tonumber, type = obj, math, tonumber, type;
 		sz:          table? { x, y },
 		mode:        string?,
 		dir:         string?,
-		move_center: boolean|number?,
-		crop_pad:    boolean|number?,
-		align:       table? { ax, ay },
 		upscale:     string?,
 		downscale:   string?,
+		align:       table? { ax, ay },
+		move_center: boolean|number?,
+		crop_pad:    boolean|number?,
 	}
 --]==]
 local function as_bool(t, v)
@@ -93,30 +93,30 @@ if PI.dir then
 	};
 	dir = name2num[PI.dir] or dir;
 end
-move_center = as_bool(PI.move_center, move_center);
-crop_pad = as_bool(PI.crop_pad, crop_pad);
-if type(PI.align) == "table" then
-	align_x = tonumber(PI.align[1]) or align_x;
-	align_y = tonumber(PI.align[2]) or align_y;
-end
-if type(PI.upscale) == "string" then upscale = PI.upscale;
+local up_name if type(PI.upscale) == "string" then up_name = PI.upscale;
 else
 	local num2name = {
 		[0] = "最近傍法", "双線形",
 		"Mitchell-Netravali", "Catmull-Rom",
 		"Lanczos2", "Lanczos3";
 	};
-	upscale = num2name[tonumber(PI.upscale) or upscale] or num2name[5];
+	up_name = num2name[tonumber(PI.upscale) or upscale] or num2name[5];
 end
-if type(PI.downscale) == "string" then downscale = PI.downscale;
+local dn_name if type(PI.downscale) == "string" then dn_name = PI.downscale;
 else
 	-- ", [0] = "最近傍法", "単純平均", "双線形", "Hamming", "Lanczos2", "Lanczos3", "
 	local num2name = {
 		[0] = "最近傍法", "単純平均", "双線形",
 		"Hamming", "Lanczos2", "Lanczos3";
 	};
-	downscale = num2name[tonumber(PI.downscale) or downscale] or num2name[5];
+	dn_name = num2name[tonumber(PI.downscale) or downscale] or num2name[5];
 end
+if type(PI.align) == "table" then
+	align_x = tonumber(PI.align[1]) or align_x;
+	align_y = tonumber(PI.align[2]) or align_y;
+end
+move_center = as_bool(PI.move_center, move_center);
+crop_pad = as_bool(PI.crop_pad, crop_pad);
 
 -- normalize paramters.
 width, height = math.max(width, 0), math.max(height, 0);
@@ -183,7 +183,7 @@ if W ~= w or H ~= h then
 		absolute = true,
 		upscale = %q,
 		downscale = %q,
-	]]):format(W, H, move_center, upscale, downscale));
+	]]):format(W, H, move_center, up_name, dn_name));
 end
 
 -- process cropping and padding.

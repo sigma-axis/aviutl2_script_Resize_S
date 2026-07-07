@@ -37,15 +37,8 @@
   - `beta53a` で動作確認済み．
 
 ##  導入方法
-`@Resize_S.anm2` ファイルに対して，以下のいずれかの操作をしてください．
 
-  1.  AviUtl2 のプレビュー画面にドラッグ&ドロップ．
-
-  1.  以下のフォルダのいずれかにコピー．
-
-      1.  スクリプトフォルダ
-          - AviUtl2 のメニューの「その他」 :arrow_right: 「アプリケーションデータ」 :arrow_right: 「スクリプトフォルダ」で表示されます．
-      1.  (1) のフォルダにある任意の名前のフォルダ
+ダウンロードした `aviutl2_script_Resize_S-v*.**.au2pkg.zip` を AviUtl2 のウィンドウにドラッグ & ドロップしてください．
 
 初期状態だと「フィルタ効果を追加」メニューの「変形」に「リサイズσ@Resize_S」と「ボックスリサイズσ@Resize_S」が追加されています．
 - 「オブジェクト追加メニューの設定」の「ラベル」項目で分類を変更できます．
@@ -61,7 +54,7 @@ Although, usage documentations for this script in languages other than Japanese 
 
 指定したアルゴリズムで画像に拡大縮小フィルタを適用します．
 
-<img width="500" height="388" alt="リサイズσの GUI" src="https://github.com/user-attachments/assets/c3be16ec-a0e2-437f-a397-416e711e904c" />
+![リサイズσの GUI](https://github.com/user-attachments/assets/c3be16ec-a0e2-437f-a397-416e711e904c)
 
 ### 拡大率
 
@@ -152,7 +145,7 @@ Although, usage documentations for this script in languages other than Japanese 
 
 指定したサイズの矩形に合うように拡大縮小フィルタを適用します．矩形内に収まる最大サイズや，矩形を覆う最小サイズを自動的に計算してそのサイズに拡大縮小します．
 
-<img width="500" height="528" alt="ボックスリサイズσの GUI" src="https://github.com/user-attachments/assets/940f2b85-494c-4d2e-a729-343863f003eb" />
+![ボックスリサイズσの GUI](https://github.com/user-attachments/assets/940f2b85-494c-4d2e-a729-343863f003eb)
 
 ### X, Y
 
@@ -248,8 +241,16 @@ Although, usage documentations for this script in languages other than Japanese 
 - **v1.12 (for beta53a)** (2026-??-??)
 
   - コード整理．
-  - `beta53a` で動作確認．
+  - 配布形式を `.au2pkg.zip` (AviUtl2 のパッケージ形式) に変更．
+    - **以前のバージョンから更新する際は，以前の導入時にコピーしたファイルを一度削除してから導入してください．**
 
+      同名ファイルが複数フォルダに分散して重複して認識されないようにするためで，次のファイルが削除対象です:
+
+      1.  `@Resize_S.anm2`
+
+      スクリプトフォルダ，またはその 1 階層下のサブフォルダ内に配置されています．
+
+  - `beta53a` で動作確認．
 
 ## 改版履歴
 

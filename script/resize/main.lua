@@ -86,10 +86,10 @@ local obj, math, tonumber, type = obj, math, tonumber, type;
 	PI = {
 		zoom:        number?,
 		sz:          table? { x, y },
-		move_center: boolean|number|nil,
 		absolute:    boolean|number|nil,
 		upscale:     string?,
 		downscale:   string?,
+		move_center: boolean|number|nil,
 	}
 --]==]
 local function as_bool(t, v)
@@ -102,7 +102,6 @@ if type(PI.sz) == "table" then
 	sz_x = tonumber(PI.sz[1]) or sz_x;
 	sz_y = tonumber(PI.sz[2]) or sz_y;
 end
-move_center = as_bool(PI.move_center, move_center);
 absolute = as_bool(PI.absolute, absolute);
 if PI.upscale then
 	local name2num = {
@@ -122,6 +121,7 @@ if PI.downscale then
 	};
 	downscale = name2num[PI.downscale] or downscale;
 end
+move_center = as_bool(PI.move_center, move_center);
 
 -- normalize paramters.
 zoom = math.max(zoom / 100, 0);
