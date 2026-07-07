@@ -40,8 +40,14 @@ local move_center = false
 ---$value:PI
 local PI = {}
 
---[[pixelshader@swap_xy:
----$include "swap_xy.hlsl"
+--[[pixelshader@transpose:
+---$include "transpose.hlsl"
+]]
+--[[pixelshader@nearest:
+---$include "nearest.hlsl"
+]]
+--[[pixelshader@bilinear_up:
+---$include "bilinear_up.hlsl"
 ]]
 --[[pixelshader@cubic_MN_up:
 ---$include "cubic_MN_up.hlsl"
@@ -54,6 +60,9 @@ local PI = {}
 ]]
 --[[pixelshader@lanczos3_up:
 ---$include "lanczos3_up.hlsl"
+]]
+--[[pixelshader@average_dn:
+---$include "average_dn.hlsl"
 ]]
 --[[pixelshader@bilinear_dn:
 ---$include "bilinear_dn.hlsl"
@@ -69,6 +78,8 @@ local PI = {}
 ]]
 
 local obj, math, tonumber, type = obj, math, tonumber, type;
+
+--#region PI / normalize parameters.
 
 -- take parameters.
 --[==[
@@ -121,6 +132,8 @@ else sz_x, sz_y = sz_x / 100, sz_y / 100 end
 upscale = math.min(math.max(math.floor(0.5 + upscale), 0), 5);
 downscale = math.min(math.max(math.floor(0.5 + downscale), 0), 5);
 
+--#endregion PI / normalize parameters.
+
 -- calculate the size.
 local w, h = obj.w, obj.h;
 local W, H = w, h;
@@ -128,62 +141,43 @@ if absolute then W, H = sz_x, sz_y;
 else W, H = sz_x * W, sz_y * H end
 local max_W, max_H = obj.getinfo("image_max");
 W, H = math.min(math.floor(0.5 + zoom * W), max_W), math.min(math.floor(0.5 + zoom * H), max_H);
-
--- apply resizing.
-local alg_x, alg_y =
-	(W > w and upscale) or (W < w and downscale) or 0,
-	(H > h and upscale) or (H < h and downscale) or 0;
 if W == w and H == h then return end -- no resize.
+if W == 0 or H == 0 then obj.load("text", ""); return end
 
-local function resize_builtin(W, H, interpolate)
-	obj.effect("リサイズ", "ピクセル数でサイズ指定", 1,
-		"補間なし", interpolate and 0 or 1, "X", W, "Y", H);
-end
-if W == 0 or H == 0 or (alg_x <= 1 and alg_y <= 1) then
-	-- 標準の補間ありリサイズはバイリニアで拡大 / 単純平均 (最大 16 ドットサンプル?) で縮小．
-	if alg_x == alg_y then resize_builtin(W, H, alg_x == 1);
-	else
-		resize_builtin(W, h, alg_x == 1);
-		resize_builtin(W, H, alg_y == 1);
-	end
-else
-	local upscale_names, downscale_names = {
-		[2] = "cubic_MN_up",
-		[3] = "cubic_CR_up",
-		[4] = "lanczos2_up",
-		[5] = "lanczos3_up",
-	}, {
-		[2] = "bilinear_dn",
-		[3] = "hamming_dn",
-		[4] = "lanczos2_dn",
-		[5] = "lanczos3_dn",
-	};
+-- prepare shaders.
+local cache_name = "cache:resize_s/temp"
+local shader_up, shader_dn = ({
+	"nearest",
+	"bilinear_up",
+	"cubic_MN_up",
+	"cubic_CR_up",
+	"lanczos2_up",
+	"lanczos3_up",
+})[upscale + 1], ({
+	"nearest",
+	"average_dn",
+	"bilinear_dn",
+	"hamming_dn",
+	"lanczos2_dn",
+	"lanczos3_dn",
+})[downscale + 1];
+local shader_x, shader_y =
+	(W > w and shader_up) or (W < w and shader_dn) or "transpose",
+	(H > h and shader_up) or (H < h and shader_dn) or "transpose";
 
-	-- first along x-axis.
-	obj.clearbuffer("tempbuffer", h, W);
-	if alg_x <= 1 then
-		if W ~= w then resize_builtin(W, h, alg_x == 1) end
-		obj.pixelshader("swap_xy", "tempbuffer", "object");
-	else
-		obj.pixelshader((W > w and upscale_names or downscale_names)[alg_x], "tempbuffer", "object",
-		{
-			w / W
-		});
-	end
+-- first along x-axis.
+obj.clearbuffer(cache_name, h, W);
+obj.pixelshader(shader_x, cache_name, "object",
+{
+	W / w, w / W, w
+});
 
-	-- then along y-axis.
-	if alg_y <= 1 then
-		obj.clearbuffer("object", W, h);
-		obj.pixelshader("swap_xy", "object", "tempbuffer");
-		if H ~= h then resize_builtin(W, H, alg_y == 1) end
-	else
-		obj.clearbuffer("object", W, H);
-		obj.pixelshader((H > h and upscale_names or downscale_names)[alg_y], "object", "tempbuffer",
-		{
-			h / H
-		});
-	end
-end
+-- then along y-axis.
+obj.clearbuffer("object", W, H);
+obj.pixelshader(shader_y, "object", cache_name,
+{
+	H / h, h / H, h
+});
 
 -- adjust the center.
 if not move_center then

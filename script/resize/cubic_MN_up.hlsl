@@ -1,18 +1,11 @@
 Texture2D src : register(t0);
 cbuffer constant0 : register(b0) {
-	float inv_zoom;
+	float zoom, inv_zoom, width_f;
 };
-
-int get_width()
+const static int width = int(width_f);
+float4 load(int x, int y)
 {
-	uint w_src_u, _;
-	src.GetDimensions(w_src_u, _);
-	return int(w_src_u);
-}
-const static int max_src = get_width() - 1;
-float4 load(int2 pos)
-{
-	return src.Load(int3(clamp(pos.x, 0, max_src), pos.y, 0));
+	return src[uint2(clamp(x, 0, width - 1), y)];
 }
 
 float ker0(float x)
@@ -26,15 +19,16 @@ float ker1(float x)
 
 float4 cubic_MN_up(float4 pos : SV_Position) : SV_Target
 {
-	float2 pos_src = float2(inv_zoom * pos.y, pos.x) - 0.5;
-	int2 pos_src_i = floor(pos_src);
-	float t = pos_src.x - pos_src_i.x;
+	const int y = int(pos.x);
+	float src_x_f = inv_zoom * pos.y - 0.5;
+	const int src_x_i = floor(src_x_f);
+	src_x_f -= src_x_i;
 
 	float4 sum = 0.0;
-	sum += ker1(t + 1) * load(pos_src_i - int2(1, 0));
-	sum += ker0(t    ) * load(pos_src_i);
-	sum += ker0(1 - t) * load(pos_src_i + int2(1, 0));
-	sum += ker1(2 - t) * load(pos_src_i + int2(2, 0));
+	sum += ker1(src_x_f + 1) * load(src_x_i - 1, y);
+	sum += ker0(src_x_f    ) * load(src_x_i    , y);
+	sum += ker0(1 - src_x_f) * load(src_x_i + 1, y);
+	sum += ker1(2 - src_x_f) * load(src_x_i + 2, y);
 
-	return saturate(sum);
+	return sum;
 }
