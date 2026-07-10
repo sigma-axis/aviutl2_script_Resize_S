@@ -44,36 +44,47 @@ local PI = {}
 ---$include "transpose.hlsl"
 ]]
 --[[pixelshader@nearest:
+---$include "header.hlsl"
 ---$include "nearest.hlsl"
 ]]
 --[[pixelshader@bilinear_up:
+---$include "header.hlsl"
 ---$include "bilinear_up.hlsl"
 ]]
 --[[pixelshader@cubic_MN_up:
+---$include "header.hlsl"
 ---$include "cubic_MN_up.hlsl"
 ]]
 --[[pixelshader@cubic_CR_up:
+---$include "header.hlsl"
 ---$include "cubic_CR_up.hlsl"
 ]]
 --[[pixelshader@lanczos2_up:
+---$include "header.hlsl"
 ---$include "lanczos2_up.hlsl"
 ]]
 --[[pixelshader@lanczos3_up:
+---$include "header.hlsl"
 ---$include "lanczos3_up.hlsl"
 ]]
 --[[pixelshader@average_dn:
+---$include "header.hlsl"
 ---$include "average_dn.hlsl"
 ]]
 --[[pixelshader@bilinear_dn:
+---$include "header.hlsl"
 ---$include "bilinear_dn.hlsl"
 ]]
 --[[pixelshader@hamming_dn:
+---$include "header.hlsl"
 ---$include "hamming_dn.hlsl"
 ]]
 --[[pixelshader@lanczos2_dn:
+---$include "header.hlsl"
 ---$include "lanczos2_dn.hlsl"
 ]]
 --[[pixelshader@lanczos3_dn:
+---$include "header.hlsl"
 ---$include "lanczos3_dn.hlsl"
 ]]
 
