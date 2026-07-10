@@ -1,0 +1,16 @@
+; Tooltip definitions
+;===============================================================
+; Target: Resize_S (https://github.com/sigma-axis/aviutl2_script_Resize_S)
+; Target Version: ${ver}
+; Language: Default
+
+[Tips.リサイズσ@Resize_S]
+effect.name=指定したアルゴリズムで画像に拡大縮小フィルタを適用します．
+PI=PI = {\n  zoom: number?,\n  sz: table? { x, y },\n  absolute: boolean|number|nil,\n  upscale: string?,\n  downscale: string?,\n  move_center: boolean|number|nil,\n}
+
+[Tips.ボックスリサイズσ@Resize_S]
+effect.name=指定したサイズの矩形に合うように拡大縮小フィルタを適用します．
+水平揃え=「余白/クリッピング」が ON のときのみ有効．余白やクリッピングのバランスを調整．
+垂直揃え=「余白/クリッピング」が ON のときのみ有効．余白やクリッピングのバランスを調整．
+余白/クリッピング=縦横比が一致しないとき，余白を残したりはみ出た部分をクリッピングして縦横比を一致させます．
+PI=PI = {\n  sz: table? { x, y },\n  mode: string?,\n  dir: string?,\n  upscale: string?,\n  downscale: string?,\n  align: table? { ax, ay },\n  move_center: boolean|number?,\n  crop_pad: boolean|number?,\n}

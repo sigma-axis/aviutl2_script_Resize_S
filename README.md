@@ -34,7 +34,7 @@
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta53a` で動作確認済み．
+  - `2.0.54` で動作確認済み．
 
 ##  導入方法
 
@@ -238,8 +238,10 @@ Although, usage documentations for this script in languages other than Japanese 
 
 ## 次の改版予定
 
-- **v1.12 (for beta53a)** (2026-??-??)
+- **v1.20** (2026-??-??)
 
+  - 一部パラメタにツールチップ表示を追加．
+  - トラックバーのマウス操作倍率指定や，中間点区間ごとに可変なチェックボックスに置き換えなど UI 調整．
   - コード整理．
   - 配布形式を `.au2pkg.zip` (AviUtl2 のパッケージ形式) に変更．
     - **以前のバージョンから更新する際は，以前の導入時にコピーしたファイルを一度削除してから導入してください．**
@@ -250,7 +252,7 @@ Although, usage documentations for this script in languages other than Japanese 
 
       スクリプトフォルダ，またはその 1 階層下のサブフォルダ内に配置されています．
 
-  - `beta53a` で動作確認．
+  - `2.0.54` で動作確認．
 
 ## 改版履歴
 

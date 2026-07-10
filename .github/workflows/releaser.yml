@@ -38,6 +38,10 @@ jobs:
           unzip aulua/$archive -d aulua
           echo `pwd`/aulua > $GITHUB_PATH
 
+      - name: Set package version
+        run: |
+          sed -i 's/\${ver}/${{ github.ref_name }}/1' Tooltip.aul2
+
       - name: Create package
         run: aulua pack
 
