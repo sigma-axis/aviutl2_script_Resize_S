@@ -40,7 +40,7 @@
 
 ダウンロードした `aviutl2_script_Resize_S-v*.**.au2pkg.zip` を AviUtl2 のウィンドウにドラッグ & ドロップしてください．
 
-初期状態だと「フィルタ効果を追加」メニューの「変形」に「リサイズσ@Resize_S」と「ボックスリサイズσ@Resize_S」が追加されています．
+初期状態だと「フィルタ効果を追加」メニューの「Resize_S」に「リサイズσ@Resize_S」と「ボックスリサイズσ@Resize_S」が追加されています．
 - 「オブジェクト追加メニューの設定」の「ラベル」項目で分類を変更できます．
 
 ### For non-Japanese speaking users
@@ -242,6 +242,7 @@ Although, usage documentations for this script in languages other than Japanese 
 
   - 一部パラメタにツールチップ表示を追加．
   - トラックバーのマウス操作倍率指定や，中間点区間ごとに可変なチェックボックスに置き換えなど UI 調整．
+  - 初期ラベル (メニュー内の分類) を「変形」から「Resize_S」に変更．
   - コード整理．
   - 配布形式を `.au2pkg.zip` (AviUtl2 のパッケージ形式) に変更．
     - **以前のバージョンから更新する際は，以前の導入時にコピーしたファイルを一度削除してから導入してください．**
