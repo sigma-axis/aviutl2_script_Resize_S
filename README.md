@@ -20,6 +20,9 @@
 
 加えてオブジェクトを特定サイズの矩形内に収めたり，特定サイズの矩形を覆うように拡大するフィルタ効果もあります．
 
+![Overview](https://github.com/user-attachments/assets/3f0f9db6-6c2f-448a-b26a-d4e1e233b106)
+- 元画像: https://www.pexels.com/photo/vegetables-and-tomatoes-on-cutting-board-255501
+
 [ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_Resize_S/releases) [紹介動画．](https://www.nicovideo.jp/watch/sm45220623)
 
 ##  お願い
