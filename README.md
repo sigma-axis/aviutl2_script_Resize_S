@@ -54,8 +54,6 @@ Although, usage documentations for this script in languages other than Japanese 
 
 指定したアルゴリズムで画像に拡大縮小フィルタを適用します．
 
-![リサイズσの GUI](https://github.com/user-attachments/assets/c3be16ec-a0e2-437f-a397-416e711e904c)
-
 ### 拡大率
 
 画像の拡大率を縦横一律に指定します．[「ピクセル数でサイズ指定」](#ピクセル数でサイズ指定)の場合でも，[「X」「Y」](#x-y)のサイズに乗じて適用されます．
@@ -142,10 +140,9 @@ Although, usage documentations for this script in languages other than Japanese 
 ##  ボックスリサイズσ
 
 ![適用例](https://github.com/user-attachments/assets/3405f41a-b611-4965-aaff-184b03f7feef)
+- 元画像: https://www.pexels.com/photo/assorted-color-kittens-45170
 
 指定したサイズの矩形に合うように拡大縮小フィルタを適用します．矩形内に収まる最大サイズや，矩形を覆う最小サイズを自動的に計算してそのサイズに拡大縮小します．
-
-![ボックスリサイズσの GUI](https://github.com/user-attachments/assets/940f2b85-494c-4d2e-a729-343863f003eb)
 
 ### X, Y
 
