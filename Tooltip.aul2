@@ -4,6 +4,9 @@
 ; Target Version: ${ver}
 ; Language: Default
 
+[Language]
+Information=Default tooltips for Rsize_S ${ver} (日本語)
+
 [Tips.リサイズσ@Resize_S]
 effect.name=指定したアルゴリズムで画像に拡大縮小フィルタを適用します．
 PI=PI = {\n  zoom: number?,\n  sz: table? { x, y },\n  absolute: boolean|number|nil,\n  upscale: string?,\n  downscale: string?,\n  move_center: boolean|number|nil,\n}
