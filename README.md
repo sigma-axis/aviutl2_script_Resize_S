@@ -132,10 +132,10 @@ Although, usage documentations for this script in languages other than Japanese 
 {
   zoom = num,         -- number 型で "拡大率" の項目を上書き，または nil.
   sz = { x, y },      -- table 型で "X", "Y" の項目を上書き，または nil.
-  move_center = bool, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
   absolute = bool,    -- boolean 型で "ピクセル数でサイズ指定" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
   upscale = str,      -- string 型で "拡大方法" の項目を上書き，または nil.
   downscale = str,    -- string 型で "縮小方法" の項目を上書き，または nil.
+  move_center = bool, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
 }
 ```
 - テキストボックスには冒頭末尾の波括弧 (`{}`) を省略して記述してください．
@@ -147,15 +147,21 @@ Although, usage documentations for this script in languages other than Japanese 
 
 指定したサイズの矩形に合うように拡大縮小フィルタを適用します．矩形内に収まる最大サイズや，矩形を覆う最小サイズを自動的に計算してそのサイズに拡大縮小します．
 
-### X / Y
+### X / Y / 背景サイズ
 
 基準となる矩形サイズを指定します．[「モード」](#モード)に応じて最終的な画像サイズが計算されます．
 
-ピクセル単位で最小値は 0, 最大値は 5000, 初期値は 256.
+- 「X」「Y」でピクセル単位でサイズを指定します．
+
+  最小値は 0, 最大値は 5000, 初期値は 256.
+
+- 「背景サイズ」が ON の場合「X」「Y」の設定を無視して，シーンのサイズにします．
+
+  初期値は OFF.
 
 ### モード
 
-画像サイズを[「X」「Y」](#x--y-1)で指定されたサイズにどのように合わせるかを指定します．次の選択肢があります:
+画像サイズを[「X」「Y」や「背景サイズ」](#x--y--背景サイズ)で指定されたサイズにどのように合わせるかを指定します．次の選択肢があります:
 
 1.  `内接最大`
 
@@ -169,7 +175,7 @@ Although, usage documentations for this script in languages other than Japanese 
 
 ### 拡大縮小
 
-元画像サイズと[「X」「Y」](#x--y-1)指定の大小関係に応じて，拡大縮小を制御します．
+元画像サイズと[「X」「Y」や「背景サイズ」](#x--y--背景サイズ)指定の大小関係に応じて，拡大縮小を制御します．
 
 次の選択肢があります．
 
@@ -197,13 +203,13 @@ Although, usage documentations for this script in languages other than Japanese 
 
 ### 余白/クリッピング
 
-拡大縮小の結果，一般には[「X」「Y」](#x--y-1)で指定した矩形と縦横どちらかの長さが異なります．この差の分だけ，足りない部分は余白で埋めたり，余剰分をクリッピングしたりして，最終的なサイズを「X」「Y」での指定に調整します．
+拡大縮小の結果，一般には[「X」「Y」や「背景サイズ」](#x--y--背景サイズ)で指定した矩形と縦横どちらかの長さが異なります．この差の分だけ，足りない部分は余白で埋めたり，余剰分をクリッピングしたりして，最終的なサイズを「X」「Y」での指定に調整します．
 
 初期値は ON.
 
 ### 水平揃え / 垂直揃え
 
-[「余白/クリッピング」](#余白クリッピング)が ON の場合のみ有効．[「X」「Y」](#x--y-1)で指定した矩形の配置を指定します．
+[「余白/クリッピング」](#余白クリッピング)が ON の場合のみ有効．[「X」「Y」や「背景サイズ」](#x--y--背景サイズ)で指定した矩形の配置を指定します．
 
 1.  -100 だと，左/上揃え．
 1.  100 だと，右/下揃え．
@@ -225,16 +231,23 @@ Although, usage documentations for this script in languages other than Japanese 
 ```lua
 {
   sz = { x, y },      -- table 型で "X", "Y" の項目を上書き，または nil.
+  screen_size = bool, -- boolean 型で "背景サイズ" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
   mode = num,         -- number 型で "モード" の項目を上書き，または nil.
   dir = num,          -- number 型で "拡大縮小" の項目を上書き，または nil.
-  move_center = bool, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  crop_pad = bool,    -- boolean 型で "余白/クリッピング" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  align = { x, y },   -- table 型で "水平揃え", "垂直揃え" の項目を上書き，または nil.
   upscale = num,      -- number 型で "拡大方法" の項目を上書き，または nil.
   downscale = num,    -- number 型で "縮小方法" の項目を上書き，または nil.
+  align = { x, y },   -- table 型で "水平揃え", "垂直揃え" の項目を上書き，または nil.
+  move_center = bool, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
+  crop_pad = bool,    -- boolean 型で "余白/クリッピング" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
 }
 ```
 - テキストボックスには冒頭末尾の波括弧 (`{}`) を省略して記述してください．
+
+## 次の改版予定
+
+- **v1.30** (2026-??-??)
+
+  - 「ボックスリサイズσ」に「背景サイズ」のパラメタを追加．
 
 ## 改版履歴
 

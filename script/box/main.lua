@@ -7,6 +7,9 @@ local width = 256
 ---$track:Y, min = 0, max = 4000, step = 1, scale = 0.25
 local height = 256
 
+---$checksection:背景サイズ
+local screen_size = false
+
 ---$select:モード
 ---内接最大 = 0
 ---外接最小 = 1
@@ -60,14 +63,15 @@ local obj, math, tonumber, type = obj, math, tonumber, type;
 -- take parameters.
 --[==[
 	PI = {
-		sz:          table? { x, y },
-		mode:        string?,
-		dir:         string?,
-		upscale:     string?,
-		downscale:   string?,
-		align:       table? { ax, ay },
-		move_center: boolean|number?,
-		crop_pad:    boolean|number?,
+		sz:          	table? { x, y },
+		screen_size:	boolean|number|nil
+		mode:        	string?,
+		dir:         	string?,
+		upscale:     	string?,
+		downscale:   	string?,
+		align:       	table? { ax, ay },
+		move_center: 	boolean|number|nil,
+		crop_pad:    	boolean|number|nil,
 	}
 --]==]
 local function as_bool(t, v)
@@ -79,6 +83,7 @@ if type(PI.sz) == "table" then
 	width = tonumber(PI.sz[1]) or width;
 	height = tonumber(PI.sz[2]) or height;
 end
+screen_size = as_bool(PI.screen_size, screen_size);
 if PI.mode then
 	local name2num = {
 		[0] = 0, 1; -- legacy compatibility.
@@ -119,7 +124,8 @@ move_center = as_bool(PI.move_center, move_center);
 crop_pad = as_bool(PI.crop_pad, crop_pad);
 
 -- normalize paramters.
-width, height = math.max(width, 0), math.max(height, 0);
+if screen_size then width, height = obj.screen_w, obj.screen_h;
+else width, height = math.max(width, 0), math.max(height, 0) end
 mode = math.min(math.max(math.floor(0.5 + mode), 0), 1);
 dir = math.min(math.max(math.floor(0.5 + dir), 0), 2);
 align_x, align_y = math.min(math.max(align_x / 100, -1), 1), math.min(math.max(align_y / 100, -1), 1);
