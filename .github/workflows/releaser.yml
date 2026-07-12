@@ -39,8 +39,9 @@ jobs:
           echo `pwd`/aulua > $GITHUB_PATH
 
       - name: Set package version
+        shell: pwsh
         run: |
-          sed -i 's/\${ver}/${{ github.ref_name }}/2' Tooltip.aul2
+          [Regex]::new('\${ver}').Replace((Get-Content .\Tooltip.aul2 -Raw), '${{ github.ref_name }}', 2).TrimEnd() | Set-Content .\Tooltip.aul2
 
       - name: Create package
         run: aulua pack
