@@ -245,6 +245,10 @@ Although, usage documentations for this script in languages other than Japanese 
 
 ## 改版履歴
 
+- **v1.31** (2026-07-12)
+
+  - ツールチップ定義ファイルのバージョン情報が間違っていたのを修正．
+
 - **v1.30** (2026-07-12)
 
   - 「ボックスリサイズσ」に「背景サイズ」のパラメタを追加．
