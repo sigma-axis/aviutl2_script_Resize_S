@@ -9,7 +9,7 @@ float ker(float x)
 float4 lanczos3_dn(float4 pos : SV_Position) : SV_Target
 {
 	const int y = int(pos.x);
-	float2 src_x_f = inv_zoom * (pos.y + float2(-2, 2));
+	float2 src_x_f = inv_zoom * (pos.y + float2(-3, 3));
 	const int2 src_x_i = floor(src_x_f + 0.5);
 	float t = zoom * (src_x_i[0] + 0.5) - pos.y;
 

@@ -9,7 +9,7 @@ project:
 package:
   id: Resize_S
   name: 拡大縮小スクリプト Resize_S
-  version: v1.31
+  version: v1.32
   information: "{name} {version} by {AUTHOR}"
   script_sub_dir: ""
   uninstall_sub_folder_file: false
