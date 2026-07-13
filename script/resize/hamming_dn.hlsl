@@ -1,7 +1,7 @@
 float ker(float x)
 {
 	static const float pi = 4 * atan(1), a0 = 25.0 / 46, a1 = 1 - a0;
-	return a0 - a1 * cos(pi / 2 * x);
+	return a0 + a1 * cos(pi * x);
 }
 
 float4 hamming_dn(float4 pos : SV_Position) : SV_Target
